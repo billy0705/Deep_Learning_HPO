@@ -2,6 +2,7 @@ HPO-B/
 HPO_B/
 hpob-data/
 saved-surrogates/
+data/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
