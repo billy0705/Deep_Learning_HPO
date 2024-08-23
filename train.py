@@ -4,6 +4,8 @@ from src.HPO_network import HPONetwork
 from torch import nn, optim, no_grad
 import torch
 import os
+import numpy as np
+import matplotlib.pyplot as plt
 
 
 def train_loop(dataloader, model, loss_fn, optimizer):
@@ -58,13 +60,13 @@ def test_loop(dataloader, model, loss_fn):
     return test_loss
 
 
-epochs = 10
-learning_rate = 1e-3
+epochs = 30
+learning_rate = 1e-2
 batch_size = 128
 dim_input = 17  # x + y
 num_outputs = 32
 dim_output = 16
-model_save_path = "./model/HPO-model-weight.pth"
+model_save_path = "./model/HPO-model-weight-3.pth"
 if not os.path.exists("./model/"):
     os.mkdir("./model/")
 
@@ -74,9 +76,15 @@ train_dataloader = DataLoader(training_data, batch_size=batch_size)
 test_dataloader = DataLoader(test_data, batch_size=batch_size)
 
 model = HPONetwork(dim_input, num_outputs, dim_output)
+
+# model = torch.load(model_save_path)
+
 model = model.to(torch.float64)
 loss_fn = nn.MSELoss()
 optimizer = optim.AdamW(model.parameters(), lr=learning_rate)
+scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min',
+                                                 factor=0.1, patience=3,
+                                                 verbose=True)
 
 train_history = []
 test_history = []
@@ -90,7 +98,23 @@ for t in range(epochs):
     if t == 0 or test_history[t] < test_history[t-1]:
         print("Saving model")
         torch.save(model, model_save_path)
+    scheduler.step(test_loss)
 
 
 print("-------------------------------")
+
+if not os.path.exists("./plot/"):
+    os.mkdir("./plot/")
+
+x = np.arange(1, len(train_history)+1)
+
+print(x)
+plt.clf()
+plt.plot(x, train_history, label="train_history")
+plt.plot(x, test_history, label="test_history")
+plt.ylabel("loss")
+plt.xlabel("epoch")
+plt.legend()
+plt.title("Loss History")
+plt.savefig("./plot/loss.png")
 print("Done!")
