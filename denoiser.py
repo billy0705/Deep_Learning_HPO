@@ -2,40 +2,53 @@ import numpy as np
 
 class Denoiser:
 
-    def __init__(self, beta, beta_timesteps, x_hat, noise, t) -> None:
-        self.beta = beta
-        self.beta_schedule = np.linspace(beta, 0.05, beta_timesteps)  # Returns evenly spaced betas over a specified timesteps
+    def __init__(self, beta_start, beta_end, beta_timesteps, schedule_method:str, x_hat, noise, t) -> None:
+        self.beta_start = beta_start
+        self.beta_end = beta_end
+        self.schedule_method = schedule_method
+        self.timesteps = beta_timesteps
+        self.beta_schedule = self.beta_scheduler()  # Returns evenly spaced betas over a specified timesteps
         self.alpha_schedule = 1 - self.beta_schedule  # alpha = 1 - beta
-        self.alpha_com_prod = np.prod(self.alpha_schedule)  # product of alphas
         self.x_hat = x_hat
         self.noise = noise
         self.t = t  # Timesteps for dataset
 
+        print(f'{self.schedule_method = }')
+
     def denoise(self):
         print('Denoising X_hat')
-        alpha_cumprod_t = self.alpha_com_prod # product of all alphas
+        alpha_cumprod_t = np.prod(self.alpha_schedule[:self.t]) # product of all alphas
         print(f'{alpha_cumprod_t = }')
-        noise = np.random.normal(loc=0.0, scale=1.0, size=self.x_hat.shape)  # Gaussian noise 
         print(f'{noise = }')
-        beta_1 = self.beta_schedule[1]
-        alpha_1 = self.alpha_schedule[1]
-        print(f'{beta_1 = }')
-        print(f'{alpha_1 = }')
+        alpha_t = self.alpha_schedule[t]
+        print(f'{alpha_t = }')
 
         # reconstructing x from x_hat given noise
-        x_reconstructed = (1/np.sqrt(1 - beta_1))*(self.x_hat - ((self.beta/np.sqrt(1-alpha_1))*noise))
+        x_reconstructed = (1/np.sqrt(alpha_t))*(self.x_hat - (((1-alpha_t)/np.sqrt(1-alpha_cumprod_t))*noise))
 
         return x_reconstructed
+    
+    def beta_scheduler(self):
+
+        if self.schedule_method == "linear":
+            beta_schedule = np.linspace(self.beta_start, self.beta_end, beta_timesteps) #Returns evenly spaced betas over a specified timesteps
+        elif self.schedule_method == "quadratic":
+            beta_schedule =  (np.linspace(0, 1, self.timesteps) ** 2) * (self.beta_end - self.beta_start) + beta_start
+        elif self.schedule_method == "cosine":
+            beta_schedule = np.cos(np.linspace(0, np.pi / 2, self.timesteps)) * (self.beta_start - self.beta_end) + self.beta_end
+        return beta_schedule
 
 if __name__ == "__main__":
     beta_timesteps = 100  # Timesteps for beta scheduler
-    beta = 0.001
+    beta_start = 0.001
+    beta_end = 0.05
     noise = 0
-    x_hat = np.random.uniform(0, 1, size=(10,10))  # Assume we have a noisy configuration
+    schedule_method = 'cosine' # may be 'linear', 'cosine' or 'quadraric'
+    x_hat = np.random.uniform(0, 1, size=(10,16))  # Assume we have a noisy configuration
 
-    t = 100  # Timesteps
-
-    denoiser = Denoiser(beta, beta_timesteps, x_hat, noise, t)
+    t = 50  # Timestep
+    noise = np.random.normal(loc=0.0, scale=1.0, size=x_hat.shape)  # Gaussian noise 
+    denoiser = Denoiser(beta_start, beta_end , beta_timesteps, schedule_method ,x_hat, noise, t)
 
     x_reconstructed = denoiser.denoise()
 
