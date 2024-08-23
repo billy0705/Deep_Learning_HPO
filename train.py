@@ -8,7 +8,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def train_loop(dataloader, model, loss_fn, optimizer):
+def train_loop(dataloader, model, loss_fn, optimizer, device):
     size = len(dataloader.dataset)
     print_interval = int(0.3 * size / batch_size)
     if print_interval == 0:
@@ -21,6 +21,10 @@ def train_loop(dataloader, model, loss_fn, optimizer):
     total_loss = 0
     for x_bar, e, improve, c in dataloader:
         # Compute prediction and loss
+        x_bar = x_bar.to(device)
+        improve = improve.to(device)
+        c = c.to(device)
+        e = e.to(device)
         pred = model(x_bar, improve, c)
         loss = loss_fn(pred, e)
 
@@ -41,7 +45,7 @@ def train_loop(dataloader, model, loss_fn, optimizer):
     return avg_loss
 
 
-def test_loop(dataloader, model, loss_fn):
+def test_loop(dataloader, model, loss_fn, device):
     model.eval()
     # size = len(dataloader.dataset)
     num_batches = len(dataloader)
@@ -50,6 +54,10 @@ def test_loop(dataloader, model, loss_fn):
 
     with no_grad():
         for x_bar, e, improve, c in dataloader:
+            x_bar = x_bar.to(device)
+            improve = improve.to(device)
+            c = c.to(device)
+            e = e.to(device)
             pred = model(x_bar, improve, c)
             test_loss += loss_fn(pred, e).item()
             # correct += (pred.argmax(1) == e).type(torch.float).sum().item()
@@ -61,7 +69,7 @@ def test_loop(dataloader, model, loss_fn):
 
 
 epochs = 30
-learning_rate = 1e-2
+learning_rate = 1e-3
 batch_size = 128
 dim_input = 17  # x + y
 num_outputs = 32
@@ -75,7 +83,14 @@ test_data = HPODataset("./data/test.json")
 train_dataloader = DataLoader(training_data, batch_size=batch_size)
 test_dataloader = DataLoader(test_data, batch_size=batch_size)
 
+
+if torch.cuda.is_available():
+    dev = "cuda:0"
+else:
+    dev = "cpu"
+device = torch.device(dev)
 model = HPONetwork(dim_input, num_outputs, dim_output)
+model.to(device)
 
 # model = torch.load(model_save_path)
 
@@ -91,8 +106,8 @@ test_history = []
 for t in range(epochs):
     print("-------------------------------")
     print(f"Epoch {t+1}\n-------------------------------")
-    train_loss = train_loop(train_dataloader, model, loss_fn, optimizer)
-    test_loss = test_loop(test_dataloader, model, loss_fn)
+    train_loss = train_loop(train_dataloader, model, loss_fn, optimizer, device)
+    test_loss = test_loop(test_dataloader, model, loss_fn, device)
     train_history.append(train_loss)
     test_history.append(test_loss)
     if t == 0 or test_history[t] < test_history[t-1]:

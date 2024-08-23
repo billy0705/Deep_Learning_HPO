@@ -62,7 +62,7 @@ class HPODataset(Dataset):
         # print(f"{dataset_id=}")
 
         num_samples = random.randint(1, dataset_count)
-        num_samples = 5
+        num_samples = 10
         # print(f"{num_samples=}")
         indices = random.sample(range(dataset_count), num_samples)
         # print(f"{indices=}")
@@ -72,25 +72,14 @@ class HPODataset(Dataset):
         for i in indices:
             x_temp = X[i].copy()
             x_temp.extend((y[i][0],))
-            if len(x_temp) != 17:
-                print(f"{i=}")
-                print(f"{X[i]=}")
-                print(f"{y[i]=}")
             C.append(x_temp)
         # print(f"{C=}")
         random_index = random.randint(0, dataset_count-1)
         random_x = X[random_index]
-        random_y = y[random_index]
-        # try:
-        #     random_x = X[random_index]
-        #     random_y = y[random_index]
-        # except Exception as e:
-        #     print(f"An error occurred: {e}")
-        #     print(f"{dataset_id=}")
-        #     print(f"{dataset_count=}")
-        #     print(f"{random_index=}")
-        if isinstance(random_y, list):
-            random_y = random_y[0]
+        random_y = y[random_index][0]
+
+        # if isinstance(random_y, list):
+        #     random_y = random_y[0]
 
         improve = 1
         # Compare random_y with all y values in C
