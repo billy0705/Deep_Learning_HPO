@@ -1,5 +1,5 @@
 import torch.nn as nn
-from model.set_transformer import SetTransformer
+from src.set_transformer import SetTransformer
 from torch import cat
 
 
@@ -14,6 +14,7 @@ class HPONetwork(nn.Module):
         self.linear1 = nn.Linear(dim_input+num_outputs, dim_output)
 
     def forward(self, x_bar, improve, c):
+        improve = improve.unsqueeze(1)
         out = self.embedding(c)
         out = cat((x_bar, improve, out), dim=1)
         out = self.linear1(out)

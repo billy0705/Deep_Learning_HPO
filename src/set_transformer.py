@@ -1,5 +1,5 @@
 import torch.nn as nn
-from model.modules import ISAB, PMA, SAB
+from src.modules import ISAB, PMA, SAB
 
 
 class SetTransformer(nn.Module):
