@@ -103,6 +103,7 @@ scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min',
 
 train_history = []
 test_history = []
+min_test_loss = 1000
 for t in range(epochs):
     print("-------------------------------")
     print(f"Epoch {t+1}\n-------------------------------")
@@ -110,8 +111,9 @@ for t in range(epochs):
     test_loss = test_loop(test_dataloader, model, loss_fn, device)
     train_history.append(train_loss)
     test_history.append(test_loss)
-    if t == 0 or test_history[t] < test_history[t-1]:
+    if t == 0 or test_history[t] < min_test_loss:
         print("Saving model")
+        min_test_loss = test_history[t]
         torch.save(model, model_save_path)
     scheduler.step(test_loss)
 
