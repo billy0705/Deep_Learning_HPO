@@ -5,22 +5,6 @@ from torch import nn, optim, no_grad
 # import torch
 
 
-learning_rate = 1e-3
-batch_size = 64
-epochs = 5
-dim_input = 17  # x + y
-num_outputs = 32
-dim_output = 16
-
-training_data = HPODataset("./data/train.json")
-test_data = HPODataset("./data/test.json")
-
-train_dataloader = DataLoader(training_data, batch_size=batch_size)
-test_dataloader = DataLoader(test_data, batch_size=batch_size)
-
-model = HPONetwork(dim_input, num_outputs, dim_output)
-
-
 def train_loop(dataloader, model, loss_fn, optimizer):
     size = len(dataloader.dataset)
     # Set the model to training mode - important for
@@ -60,8 +44,21 @@ def test_loop(dataloader, model, loss_fn):
     # {(100*correct):>0.1f}%, Avg loss: {test_loss:>8f}")
 
 
-loss_fn = nn.CrossEntropyLoss()
-optimizer = optim.SGD(model.parameters(), lr=learning_rate)
+learning_rate = 1e-3
+batch_size = 64
+# epochs = 5
+dim_input = 17  # x + y
+num_outputs = 32
+dim_output = 16
+
+training_data = HPODataset("./data/train.json")
+test_data = HPODataset("./data/test.json")
+train_dataloader = DataLoader(training_data, batch_size=batch_size)
+test_dataloader = DataLoader(test_data, batch_size=batch_size)
+
+model = HPONetwork(dim_input, num_outputs, dim_output)
+loss_fn = nn.MSELoss()
+optimizer = optim.AdamW(model.parameters(), lr=learning_rate)
 
 epochs = 10
 for t in range(epochs):
