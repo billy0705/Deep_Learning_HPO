@@ -98,8 +98,7 @@ model = model.to(torch.float64)
 loss_fn = nn.MSELoss()
 optimizer = optim.AdamW(model.parameters(), lr=learning_rate)
 scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min',
-                                                 factor=0.1, patience=3,
-                                                 verbose=True)
+                                                 factor=0.1, patience=3)
 
 train_history = []
 test_history = []
@@ -111,6 +110,8 @@ for t in range(epochs):
     test_loss = test_loop(test_dataloader, model, loss_fn, device)
     train_history.append(train_loss)
     test_history.append(test_loss)
+    current_lr = scheduler.get_last_lr()[0]
+    print(f"Current learning rate: {current_lr:.6f}")
     if t == 0 or test_history[t] < min_test_loss:
         print("Saving model")
         min_test_loss = test_history[t]
