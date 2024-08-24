@@ -110,7 +110,7 @@ for t in range(epochs):
     test_loss = test_loop(test_dataloader, model, loss_fn, device)
     train_history.append(train_loss)
     test_history.append(test_loss)
-    current_lr = scheduler.get_last_lr()[0]
+    current_lr = float(optimizer.param_groups[0]["lr"])
     print(f"Current learning rate: {current_lr:.6f}")
     if t == 0 or test_history[t] < min_test_loss:
         print("Saving model")
