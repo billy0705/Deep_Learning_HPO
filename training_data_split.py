@@ -37,10 +37,10 @@ for dataset_id in hpob_hdlr.meta_train_data[search_space_id]:
     x_shuffled = list(x_shuffled)
     y_shuffled = list(y_shuffled)
 
-    dataset_train["X"] = x_shuffled[:split_index]
-    dataset_train["y"] = y_shuffled[:split_index]
-    dataset_test["X"] = x_shuffled[split_index:]
-    dataset_test["y"] = y_shuffled[split_index:]
+    dataset_train["X"] = x_shuffled[split_index:]
+    dataset_train["y"] = y_shuffled[split_index:]
+    dataset_test["X"] = x_shuffled[:split_index]
+    dataset_test["y"] = y_shuffled[:split_index]
     train_data[search_space_id][dataset_id] = dataset_train.copy()
     test_data[search_space_id][dataset_id] = dataset_test.copy()
 
