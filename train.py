@@ -72,9 +72,9 @@ epochs = 30
 learning_rate = 1e-3
 batch_size = 128
 dim_input = 17  # x + y
-num_outputs = 32
+num_outputs = 64
 dim_output = 16
-model_save_path = "./model/HPO-model-weight-3.pth"
+model_save_path = "./model/HPO-model-weight.pth"
 if not os.path.exists("./model/"):
     os.mkdir("./model/")
 
