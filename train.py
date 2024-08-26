@@ -70,11 +70,11 @@ def test_loop(dataloader, model, loss_fn, device):
 
 epochs = 30
 learning_rate = 1e-3
-batch_size = 128
+batch_size = 64
 dim_input = 17  # x + y
-num_outputs = 64
+num_outputs = 32
 dim_output = 16
-model_save_path = "./model/HPO-model-weight.pth"
+model_save_path = "./model/HPO-model-weight-32.pth"
 if not os.path.exists("./model/"):
     os.mkdir("./model/")
 
@@ -98,7 +98,7 @@ model = model.to(torch.float64)
 loss_fn = nn.MSELoss()
 optimizer = optim.AdamW(model.parameters(), lr=learning_rate)
 scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min',
-                                                 factor=0.1, patience=3)
+                                                 factor=0.1, patience=10)
 
 train_history = []
 test_history = []
@@ -134,5 +134,5 @@ plt.ylabel("loss")
 plt.xlabel("epoch")
 plt.legend()
 plt.title("Loss History")
-plt.savefig("./plot/loss.png")
+plt.savefig("./plot/loss-32.png")
 print("Done!")

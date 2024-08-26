@@ -5,7 +5,7 @@ from torch import cat
 
 class HPONetwork(nn.Module):
     def __init__(self, dim_input, num_outputs,
-                 dim_output, emb_output=1, hidden=128):
+                 dim_output, emb_output=1, hidden=32):
         super(HPONetwork, self).__init__()
         self.embedding = nn.Sequential(
             SetTransformer(dim_input, num_outputs, emb_output),
