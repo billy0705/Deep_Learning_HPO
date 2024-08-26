@@ -3,9 +3,6 @@ from src.denoiser import Denoiser
 import torch
 
 
-epochs = 30
-learning_rate = 1e-3
-batch_size = 64
 dim_input = 17  # x + y
 num_outputs = 32
 dim_output = 16
