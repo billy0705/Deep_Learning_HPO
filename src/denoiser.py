@@ -22,10 +22,10 @@ class Denoiser:
         print('Denoising X_hat')
         # product of all alphas
         alpha_cumprod_t = np.prod(self.alpha_schedule[:t])
-        print(f'{alpha_cumprod_t=}')
-        print(f'{noise=}')
+        # print(f'{alpha_cumprod_t=}')
+        # print(f'{noise=}')
         alpha_t = self.alpha_schedule[t]
-        print(f'{alpha_t=}')
+        # print(f'{alpha_t=}')
 
         # reconstructing x from x_hat given noise
         x_reconstructed = ((1/np.sqrt(alpha_t)) *
