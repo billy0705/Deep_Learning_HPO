@@ -19,7 +19,7 @@ class Denoiser:
         print(f'{self.schedule_method=}')
 
     def denoise(self, x_hat, noise, t):
-        print('Denoising X_hat')
+        # print('Denoising X_hat')
         # product of all alphas
         alpha_cumprod_t = np.prod(self.alpha_schedule[:t])
         # print(f'{alpha_cumprod_t=}')
@@ -50,7 +50,7 @@ class Denoiser:
 
 
 if __name__ == "__main__":
-    beta_timesteps = 100  # Timesteps for beta scheduler
+    beta_timesteps = 1001  # Timesteps for beta scheduler
     beta_start = 0.001
     beta_end = 0.05
     noise = 0

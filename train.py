@@ -8,18 +8,18 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 
-epochs = 30
+epochs = 10
 learning_rate = 1e-3
 batch_size = 64
 dim_input = 17  # x + y
 num_outputs = 32
 dim_output = 16
-model_save_path = "./model/HPO-model-weight-32.pth"
+model_save_path = "./model/HPO-model-weight-32-new.pth"
 if not os.path.exists("./model/"):
     os.mkdir("./model/")
 
-training_data = HPODataset("./data/train.json")
-test_data = HPODataset("./data/test.json")
+training_data = HPODataset("./data/train.json", num_samples=50)
+test_data = HPODataset("./data/test.json", num_samples=50)
 train_dataloader = DataLoader(training_data, batch_size=batch_size)
 test_dataloader = DataLoader(test_data, batch_size=batch_size)
 
@@ -32,7 +32,7 @@ device = torch.device(dev)
 model = HPONetwork(dim_input, num_outputs, dim_output)
 model.to(device)
 
-# model = torch.load(model_save_path)
+model = torch.load(model_save_path)
 
 model = model.to(torch.float64)
 loss_fn = nn.MSELoss()

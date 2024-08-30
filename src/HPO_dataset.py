@@ -7,13 +7,14 @@ from src.noiser import NoiseAdder
 
 class HPODataset(Dataset):
 
-    def __init__(self, json_file, search_space_id="5971"):
+    def __init__(self, json_file, search_space_id="5971", num_samples=50):
         self.data = self.read_json(json_file)
         self.search_space_id = search_space_id
         self.datasets_idx, self.datasets_cnt = self.get_dataset_idx()
         self.datasets_num = len(self.datasets_idx)
         self.data_len = sum(self.datasets_cnt)
         self.probabilities = [x / self.data_len for x in self.datasets_cnt]
+        self.num_samples = num_samples
         # print(f"{self.datasets_num=}")
         # print(f"{self.datasets_idx=}")
         # print(f"{self.datasets_cnt=}")
@@ -25,8 +26,8 @@ class HPODataset(Dataset):
         f.close()
         return data
 
-    def define_noiser(self, beta_timesteps=100, beta_start=0.001, beta_end=0.05,
-                      schedule_method='cosine'):
+    def define_noiser(self, beta_timesteps=1001, beta_start=0.001,
+                      beta_end=0.05, schedule_method='cosine'):
         self.beta_timesteps = beta_timesteps
         self.beta_start = beta_start
         self.beta_end = beta_end
@@ -61,8 +62,10 @@ class HPODataset(Dataset):
         # print(f"{dataset_count=}")
         # print(f"{dataset_id=}")
 
-        num_samples = random.randint(1, dataset_count)
-        num_samples = 10
+        # num_samples = random.randint(1, dataset_count-1)
+        num_samples = self.num_samples
+        if dataset_count < num_samples:
+            num_samples = dataset_count - 1
         # print(f"{num_samples=}")
         indices = random.sample(range(dataset_count), num_samples)
         # print(f"{indices=}")

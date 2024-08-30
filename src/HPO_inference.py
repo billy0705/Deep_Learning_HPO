@@ -5,7 +5,7 @@ from src.denoiser import Denoiser
 
 class HPOInference():
     def __init__(self, model_save_path, dim_input=17, num_outputs=32,
-                 dim_output=16, device="cpu", beta_timesteps=100,
+                 dim_output=16, device="cpu", beta_timesteps=1001,
                  beta_start=0.001, beta_end=0.05, schedule_method='cosine'):
 
         self.model_save_path = model_save_path
@@ -41,13 +41,13 @@ class HPOInference():
                                  self.beta_timesteps, self.schedule_method)
 
     def generator(self, x_hat, c):
-        t = 50  # Timestep
+        t = 1000  # Timestep
         improve = torch.ones(1, dtype=torch.float64)
         x_hat = x_hat.to(self.device)
         improve = improve.to(self.device)
         c = c.to(self.device)
         noise_pred = self.model(x_hat, improve, c)
-        print(f"{noise_pred=}")
+        # print(f"{noise_pred=}")
         x_denoised = self.denoiser.denoise(x_hat, noise_pred, t)
 
         # print("Noisy Configuration x_hat:", x_hat)
