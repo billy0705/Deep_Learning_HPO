@@ -48,6 +48,24 @@ class HPODataset(Dataset):
 
     def __len__(self):
         return self.data_len
+        # return 100
+
+    def set_number_sample(self, n_sample):
+        self.num_samples = n_sample + 1
+
+    def extend_to_50(self, indices):
+        original_length = len(indices)
+
+        if original_length >= self.num_samples:
+            extended_indices = indices[:self.num_samples]
+        else:
+            overlap = indices
+            repeat_times = (self.num_samples - original_length) // len(overlap) + 1
+            extended_indices = np.concatenate((indices, np.tile(overlap, repeat_times)))
+
+            extended_indices = extended_indices[:self.num_samples]
+
+        return extended_indices
 
     def __getitem__(self, idx):
 
@@ -68,6 +86,9 @@ class HPODataset(Dataset):
             num_samples = dataset_count - 1
         # print(f"{num_samples=}")
         indices = random.sample(range(dataset_count), num_samples)
+
+        if num_samples != self.num_samples:
+            indices = self.extend_to_50(indices)
         # print(f"{indices=}")
         # print(f"{X[indices[0]]=}")
         # print(f"{y[indices[0]]=}")

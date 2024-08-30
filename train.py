@@ -8,7 +8,7 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 
-epochs = 10
+epochs = 50
 learning_rate = 1e-3
 batch_size = 64
 dim_input = 17  # x + y
@@ -18,8 +18,8 @@ model_save_path = "./model/HPO-model-weight-32-new.pth"
 if not os.path.exists("./model/"):
     os.mkdir("./model/")
 
-training_data = HPODataset("./data/train.json", num_samples=50)
-test_data = HPODataset("./data/test.json", num_samples=50)
+training_data = HPODataset("./data/train.json")
+test_data = HPODataset("./data/test.json")
 train_dataloader = DataLoader(training_data, batch_size=batch_size)
 test_dataloader = DataLoader(test_data, batch_size=batch_size)
 
@@ -52,6 +52,8 @@ for t in range(epochs):
     train_history.append(train_loss)
     test_history.append(test_loss)
     current_lr = float(optimizer.param_groups[0]["lr"])
+    train_dataloader.dataset.set_number_sample(t+1)
+    test_dataloader.dataset.set_number_sample(t+1)
     print(f"Current learning rate: {current_lr:.6f}")
     if t == 0 or test_history[t] < min_test_loss:
         print("Saving model")
