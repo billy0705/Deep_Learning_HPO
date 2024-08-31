@@ -7,14 +7,15 @@ import torch
 import os
 import numpy as np
 import matplotlib.pyplot as plt
+import random
 
-epochs = 50
+epochs = 100
 learning_rate = 1e-3
-batch_size = 64
+batch_size = 128
 dim_input = 17  # x + y
 num_outputs = 32
 dim_output = 16
-model_save_path = "./model/HPO-model-weight-32-new.pth"
+model_save_path = "./model/HPO-model-weight-32-0831.pth"
 if not os.path.exists("./model/"):
     os.mkdir("./model/")
 
@@ -32,7 +33,7 @@ device = torch.device(dev)
 model = HPONetwork(dim_input, num_outputs, dim_output)
 model.to(device)
 
-model = torch.load(model_save_path)
+# model = torch.load(model_save_path)
 
 model = model.to(torch.float64)
 loss_fn = nn.MSELoss()
@@ -52,8 +53,10 @@ for t in range(epochs):
     train_history.append(train_loss)
     test_history.append(test_loss)
     current_lr = float(optimizer.param_groups[0]["lr"])
-    train_dataloader.dataset.set_number_sample(t+1)
-    test_dataloader.dataset.set_number_sample(t+1)
+    num_samples = random.randint(1, 50)
+    train_dataloader.dataset.set_number_sample(num_samples)
+    test_dataloader.dataset.set_number_sample(num_samples)
+    print(f"Current sample number: {num_samples}")
     print(f"Current learning rate: {current_lr:.6f}")
     if t == 0 or test_history[t] < min_test_loss:
         print("Saving model")
